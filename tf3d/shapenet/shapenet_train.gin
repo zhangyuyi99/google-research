@@ -1,26 +1,26 @@
-num_classes = 16
+num_classes = 4
 
 # Preprocessor
-semantic_pointcloud_preprocess.images_points_correspondence_fn = @waymo_prepare_lidar_images_and_correspondences
-semantic_pointcloud_preprocess.compute_semantic_labels_fn = @waymo_object_per_frame_compute_semantic_labels
-semantic_pointcloud_preprocess.points_pad_or_clip_size = 200000
+semantic_pointcloud_preprocess.points_pad_or_clip_size = 3000
 semantic_pointcloud_preprocess.point_feature_keys = ('point_offset_bins',)
-semantic_pointcloud_preprocess.voxel_grid_cell_size = (0.2, 0.2, 0.2)
-semantic_pointcloud_preprocess.voxels_pad_or_clip_size = 70000
+semantic_pointcloud_preprocess.voxel_grid_cell_size = (0.00001, 0.00001, 0.00001)
+semantic_pointcloud_preprocess.voxels_pad_or_clip_size = 3000
 semantic_pointcloud_preprocess.z_min_degree_rotation = -180.0
 semantic_pointcloud_preprocess.z_max_degree_rotation = 180.0
-semantic_pointcloud_preprocess.points_key = 'points_position'
-semantic_pointcloud_preprocess.intensities_key = 'points_intensity'
-semantic_pointcloud_preprocess.elongations_key = 'points_elongation'
+semantic_pointcloud_preprocess.points_key = 'pointcloud/position'
+semantic_pointcloud_preprocess.intensities_key = None
+semantic_pointcloud_preprocess.elongations_key = None
 semantic_pointcloud_preprocess.colors_key = None
 semantic_pointcloud_preprocess.normals_key = None
-semantic_pointcloud_preprocess.semantic_labels_key = 'semantic_labels'
+semantic_pointcloud_preprocess.motion_labels_key = None
+semantic_pointcloud_preprocess.semantic_labels_key = 'pointcloud/label'
 semantic_pointcloud_preprocess.spin_coords_key = None
 semantic_pointcloud_preprocess.semantic_labels_offset = 0
 semantic_pointcloud_preprocess.view_names = ('rgb_view',)
 semantic_pointcloud_preprocess.points_in_image_frame_key = None
 semantic_pointcloud_preprocess.ignore_labels = (255,)
 semantic_pointcloud_preprocess.only_keep_first_return_lidar_points = False
+semantic_pointcloud_preprocess.is_training = False
 
 
 # Dataset

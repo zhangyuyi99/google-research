@@ -35,4 +35,6 @@ from tf3d.semantic_segmentation import metric as semantic_segmentation_metric
 from tf3d.semantic_segmentation import model as semantic_segmentation_model
 from tf3d.semantic_segmentation import preprocessor as semantic_segmentation_preprocessor
 from tf3d.utils import callback_utils
+from tf3d.shapenet import shapenet_preprocessor
+# from tf3d.train import step_decay
 # pylint: enable=unused-import

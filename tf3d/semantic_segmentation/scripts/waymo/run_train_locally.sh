@@ -23,17 +23,17 @@ TRAIN_DIR="/tmp/tf3d_experiment/${JOB_NAME}"
 NUM_WORKERS=1
 STRATEGY="mirrored"  # set to "multi_worker_mirrored" when NUM_WORKERS > 1
 NUM_GPUS=1
-BATCH_SIZE=4
+BATCH_SIZE=16
 LEARNING_RATES=0.3
 
 NUM_STEPS_PER_EPOCH=100
-NUM_EPOCHS=80
+NUM_EPOCHS=3
 LOG_FREQ=100
 
 # Data
 DATASET_NAME="waymo_object_per_frame"
-TRAIN_SPLIT="train"
-DATASET_PATH="/usr/local/google/home/${USER}/Developer/waymo_data/" # REPLACE
+TRAIN_SPLIT="original"
+DATASET_PATH="/u/yvu2cv/google-research/tf3d/data/waymo_dataset" # REPLACE
 
 # Gin config
 IMPORT_MODULE="tf3d.gin_imports"

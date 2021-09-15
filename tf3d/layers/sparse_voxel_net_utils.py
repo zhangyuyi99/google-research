@@ -126,7 +126,11 @@ def voxel_pooling(voxel_features, voxel_xyz_indices, num_valid_voxels,
     ValueError: If batch size or feature dimensions are unknown at graph
       construction time.
   """
+  # print('voxel_xyz_indices')
+  # print(voxel_xyz_indices)
   batch_size = voxel_xyz_indices.get_shape().as_list()[0]
+  # if batch_size is None:
+  #     batch_size=1
   if batch_size is None:
     raise ValueError("batch_size is unknown at graph construction time.")
   feature_dims = voxel_features.get_shape().as_list()[2]

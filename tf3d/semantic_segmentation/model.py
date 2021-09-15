@@ -85,6 +85,10 @@ class SemanticSegmentationModel(base_model.BaseModel):
                     inputs[standard_fields.InputDataFields.num_valid_voxels])
     outputs = self.sparse_conv_unet(voxel_inputs, training=training)
 
+    # print('model call voxel inputs')
+    # print(voxel_inputs)
+    # print('model call outputs')
+    # print(outputs)
     # If at eval time, transfer voxel features to points
     if ((not training) and
         (standard_fields.InputDataFields.points_to_voxel_mapping in inputs)):

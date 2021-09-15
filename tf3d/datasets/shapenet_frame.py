@@ -21,18 +21,18 @@ import gin.tf
 import tensorflow as tf
 import tensorflow_datasets as tfds
 
-from tf3d.datasets.specs import siemens_specs
+from tf3d.datasets.specs import shapenet_specs
 from tf3d.datasets.utils import example_parser
 from tf3d.utils import box_utils
 
 
-_FILE_PATTERN = '%s*.pts'
+_FILE_PATTERN = '%s*.tfrecords'
 _FILE_PATTERN_TFRECORD = '%s*.tfrecords'
 
-DATASET_DIR = "/u/yvu2cv/google-research/tf3d/data/shapenet_data/train_data/02691156"
+DATASET_DIR = "/u/yvu2cv/google-research/tf3d/data/shapenet_data_tfrecords/val_data_with_labels_example/02691156"
 
 
-DATASET_FORMAT = 'pts'
+DATASET_FORMAT = 'tfrecord'
 
 # def _get_feature_label_keys():
 #   """Extracts and returns the dataset feature and label keys."""
@@ -74,6 +74,15 @@ def get_decode_fn():
     A tf.data decoder.
   """
 
+  def decode_fn(value):
+    tensors = example_parser.decode_serialized_example(
+        serialized_example=value, features=shapenet_specs.pointcloud_feature_spec(with_annotations=True))
+    tensor_dict = tfds.core.utils.flatten_nest_dict(tensors)
+    return tensor_dict
+
+  return decode_fn
+
+ #################################################
   # def decode_fn(value):
   #   tensors = example_parser.decode_serialized_example(
   #       serialized_example=value,
@@ -81,20 +90,21 @@ def get_decode_fn():
   #   tensor_dict = tfds.core.utils.flatten_nest_dict(tensors)
   #   return tensor_dict
 
-  def decode_fn(value):
-
-    data = tf.io.read_file(value)
-
-    data_string = data.numpy()
-    data_string = data_string[:-1]
-
-    data_string = tf.strings.split(data_string, sep="\n")
-    data_string = tf.strings.split(data_string, sep=" ")
-    # print(data_string)
-    data = tf.strings.to_number(data_string, out_type=tf.dtypes.float32, name=None)
-
-    # print(data)
-    return data
+##################################################
+  # def decode_fn(value):
+  #
+  #   data = tf.io.read_file(value)
+  #
+  #   data_string = data.numpy()
+  #   data_string = data_string[:-1]
+  #
+  #   data_string = tf.strings.split(data_string, sep="\n")
+  #   data_string = tf.strings.split(data_string, sep=" ")
+  #   # print(data_string)
+  #   data = tf.strings.to_number(data_string, out_type=tf.dtypes.float32, name=None)
+  #
+  #   # print(data)
+  #   return data
 
 ###################################################
     # print('***************decode_fn')
@@ -164,10 +174,11 @@ def get_decode_fn():
     # dataset = dataset.batch(batch_size=3)
     # return tf.data.Dataset.from_tensor_slices(inputs)
 
-    data = np.reshape(data,(batch_size,num_valid_voxels,3))
-
-    tensor_dict = tf.convert_to_tensor(data, dtype=tf.float32)
-
-    return tensor_dict
-
-  return decode_fn
+#################################################################
+  #   data = np.reshape(data,(batch_size,num_valid_voxels,3))
+  #
+  #   tensor_dict = tf.convert_to_tensor(data, dtype=tf.float32)
+  #
+  #   return tensor_dict
+  #
+  # return decode_fn

@@ -43,7 +43,7 @@ flags.DEFINE_enum('distribution_strategy', None,
                   ['multi_worker_mirrored', 'mirrored'],
                   'The Distribution Strategy to use.')
 
-flags.DEFINE_bool('run_functions_eagerly', False,
+flags.DEFINE_bool('run_functions_eagerly', True,
                   'Run function eagerly for easy debugging.')
 
 flags.DEFINE_integer(
@@ -72,11 +72,12 @@ flags.DEFINE_integer('gpu_memory_limit', 14700,
 
 
 @gin.configurable
-def train(strategy,
-          write_path,
+def train(write_path,
+          strategy,
           learning_rate_fn=None,
           model_class=None,
           input_fn=None,
+          inputs=None,
           optimizer_fn=tf.keras.optimizers.SGD):
   """A function that build the model and train.
 
@@ -93,27 +94,39 @@ def train(strategy,
 
   with strategy.scope():
     logging.info('Model creation starting')
-    model = model_class(
+    from tf3d.semantic_segmentation import model
+    model = model.SemanticSegmentationModel(
         train_dir=os.path.join(write_path, 'train'),
         summary_log_freq=FLAGS.log_freq)
 
     logging.info('Model compile starting')
-    model.compile(optimizer=optimizer_fn(learning_rate=learning_rate_fn()))
+    model.compile(optimizer=optimizer_fn(learning_rate=learning_rate_fn()), run_eagerly=True)
 
     backup_checkpoint_callback = tf.keras.callbacks.experimental.BackupAndRestore(
         backup_dir=os.path.join(write_path, 'backup_model'))
     checkpoint_callback = callback_utils.CustomModelCheckpoint(
         ckpt_dir=os.path.join(write_path, 'model'),
-        save_epoch_freq=1,
-        max_to_keep=3)
+        save_epoch_freq=5,
+        max_to_keep=100)
 
     logging.info('Input creation starting')
     total_batch_size = FLAGS.batch_size * FLAGS.num_workers * FLAGS.num_gpus
+
     inputs = input_fn(is_training=True, batch_size=total_batch_size)
+
     logging.info(
         'Model fit starting for %d epochs, %d step per epoch, total batch size:%d',
         flags.FLAGS.num_epochs, flags.FLAGS.num_steps_per_epoch,
         total_batch_size)
+
+  # from tf3d.shapenet import shapenet_preprocessor
+  # inputs = shapenet_preprocessor.preprocess_data()
+
+  print('*********************restoring Checkpoint')
+  ckpt_path = tf.train.latest_checkpoint("/u/yvu2cv/google-research/tf3d/shapenet/log/train_with_val_data_seg_shapenet_009/model")
+  checkpoint = tf.train.Checkpoint(model=model,ckpt_saved_epoch=tf.Variable(initial_value=-1, dtype=tf.int64))
+  checkpoint.restore(ckpt_path).expect_partial()
+  print('*********************Checkpoint restored successfully')
 
   model.fit(
       x=inputs,
@@ -121,6 +134,8 @@ def train(strategy,
       steps_per_epoch=FLAGS.num_steps_per_epoch,
       epochs=FLAGS.num_epochs,
       verbose=1 if FLAGS.run_functions_eagerly else 2)
+
+  # model.save('/u/yvu2cv/google-research/tf3d/shapenet/saved_model/my_model_003')
   model.close_writer()
 
 
@@ -166,13 +181,14 @@ def main(argv):
       gin.parse_config(FLAGS.params)
 
     if FLAGS.run_functions_eagerly:
-      tf.config.experimental_run_functions_eagerly(True)
+      tf.config.run_functions_eagerly(True)
     logging.info('Training starting. '
                  'Is run_functions_eagerly: %s', FLAGS.run_functions_eagerly)
 
     if not tf.io.gfile.exists(FLAGS.train_dir):
       tf.io.gfile.makedirs(FLAGS.train_dir)
 
+    # train(strategy=strategy, write_path=write_path, inputs=inputs)
     train(strategy=strategy, write_path=write_path)
 
   except (tf.errors.UnavailableError, tf.errors.FailedPreconditionError) as e:

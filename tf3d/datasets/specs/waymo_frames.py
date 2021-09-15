@@ -117,26 +117,26 @@ OBJECT_FEATURE_SPEC = tfds.features.FeaturesDict({
 
 # Feature specification of frame dataset.
 FRAME_FEATURE_SPEC = tfds.features.FeaturesDict({
-    # A unique name that identifies the sequence the frame is from.
-    'scene_name': tfds.features.Text(),
-    # A unique name that identifies this particular frame.
-    'frame_name': tfds.features.Text(),
-    # Frame *start* time (set to the timestamp of the first top laser spin).
-    'timestamp': tf.int64,
-    # Day, Dawn/Dusk, or Night, determined from sun elevation.
-    'time_of_day': tfds.features.Text(),
-    # Human readable location (e.g. CHD, SF) of the run segment.
-    'location': tfds.features.Text(),
-    # Sunny or Rain.
-    'weather': tfds.features.Text(),
-    # Camera sensor data.
-    'cameras': {
-        'front': CAMERA_FEATURE_SPEC,
-        'front_left': CAMERA_FEATURE_SPEC,
-        'front_right': CAMERA_FEATURE_SPEC,
-        'side_left': CAMERA_FEATURE_SPEC,
-        'side_right': CAMERA_FEATURE_SPEC,
-    },
+    # # A unique name that identifies the sequence the frame is from.
+    # 'scene_name': tfds.features.Text(),
+    # # A unique name that identifies this particular frame.
+    # 'frame_name': tfds.features.Text(),
+    # # Frame *start* time (set to the timestamp of the first top laser spin).
+    # 'timestamp': tf.int64,
+    # # Day, Dawn/Dusk, or Night, determined from sun elevation.
+    # 'time_of_day': tfds.features.Text(),
+    # # Human readable location (e.g. CHD, SF) of the run segment.
+    # 'location': tfds.features.Text(),
+    # # Sunny or Rain.
+    # 'weather': tfds.features.Text(),
+    # # Camera sensor data.
+    # 'cameras': {
+    #     'front': CAMERA_FEATURE_SPEC,
+    #     'front_left': CAMERA_FEATURE_SPEC,
+    #     'front_right': CAMERA_FEATURE_SPEC,
+    #     'side_left': CAMERA_FEATURE_SPEC,
+    #     'side_right': CAMERA_FEATURE_SPEC,
+    # },
     # lidar sensor data.
     'lidars': {
         'top': LIDAR_FEATURE_SPEC,

@@ -14,17 +14,17 @@
 
 #!/bin/bash
 
-VERSION=004
+VERSION=010
 JOB_NAME="seg_shapenet_${VERSION}"
-TRAIN_DIR="/u/yvu2cv/google-research/tf3d/shapenet/log/${JOB_NAME}"
+TRAIN_DIR="/u/yvu2cv/google-research/tf3d/shapenet/log/train_with_val_data_${JOB_NAME}"
 
 
 
 NUM_WORKERS=1
 STRATEGY='mirrored'  # set to "multi_worker_mirrored" when NUM_WORKERS > 1
 NUM_GPUS=1
-BATCH_SIZE=12
-LEARNING_RATES=0.3
+BATCH_SIZE=3
+LEARNING_RATES=0.2
 
 NUM_STEPS_PER_EPOCH=100
 NUM_EPOCHS=100
@@ -33,7 +33,7 @@ LOG_FREQ=100
 # Data
 DATASET_NAME="shapenet"
 TRAIN_SPLIT="0"
-DATASET_PATH="/u/yvu2cv/google-research/tf3d/data/shapenet_data_tfrecords/train_data_with_labels/02691156" # REPLACE
+DATASET_PATH="/u/yvu2cv/google-research/tf3d/data/shapenet_data_tfrecords/val_data_with_labels/02691156" # REPLACE
 
 # Gin config
 IMPORT_MODULE="tf3d.gin_imports"

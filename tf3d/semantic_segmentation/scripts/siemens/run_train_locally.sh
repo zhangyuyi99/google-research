@@ -33,7 +33,7 @@ LOG_FREQ=10
 # Data
 DATASET_NAME="siemens_dataset"
 TRAIN_SPLIT="train"
-DATASET_PATH="/u/yvu2cv/tf3d_data/siemens_dataset" # REPLACE
+DATASET_PATH="/u/yvu2cv/google-research/tf3d/data/siemens_dataset" # REPLACE
 
 # Gin config
 IMPORT_MODULE="tf3d.gin_imports"

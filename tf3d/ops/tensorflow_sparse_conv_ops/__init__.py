@@ -16,6 +16,6 @@
 """Import the sparse conv 2d/3d op."""
 from __future__ import absolute_import
 
-from tensorflow_sparse_conv_ops import sparse_conv_ops
+from tf3d.ops.tensorflow_sparse_conv_ops import sparse_conv_ops
 submanifold_sparse_conv3d = sparse_conv_ops.submanifold_sparse_conv3d
 submanifold_sparse_conv2d = sparse_conv_ops.submanifold_sparse_conv2d

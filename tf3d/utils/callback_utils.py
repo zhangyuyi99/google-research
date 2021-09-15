@@ -208,7 +208,12 @@ class CustomTensorBoard(tf.keras.callbacks.Callback):
     outputs = logs['outputs']
     if self._metric:
       for metric in self._metric:
+#        print('inputs')
+#        print(inputs)
+#        print('outputs')
+#        print(outputs)
         metric.update_state(inputs=inputs, outputs=outputs)
+
 
     if batch <= self.num_qualitative_examples:
       # point cloud visualization

@@ -24,12 +24,16 @@ import tensorflow as tf
 from tf3d.datasets import rio  # pylint: disable=g-bad-import-order
 from tf3d.datasets import scannet_scene  # pylint: disable=g-bad-import-order
 from tf3d.datasets import waymo_object_per_frame  # pylint: disable=g-bad-import-order
+from tf3d.datasets import siemens_dataset_frame
+from tf3d.datasets import shapenet_frame
 
 
 _DATASET_MAP = {
     'rio': rio,
     'scannet_scene': scannet_scene,
     'waymo_object_per_frame': waymo_object_per_frame,
+    'siemens_dataset': siemens_dataset_frame,
+    'shapenet': shapenet_frame,
 }
 
 
@@ -107,32 +111,100 @@ def _read_data(file_read_func, file_pattern, shuffle, num_readers,
   Returns:
     A tf.data.Dataset.
   """
-  # Shard, shuffle, and read files.
-  dataset = tf.data.Dataset.list_files(
-      file_pattern=file_pattern, shuffle=shuffle)
+
+    # Shard, shuffle, and read files.
+  dataset = tf.data.Dataset.list_files(file_pattern=file_pattern, shuffle=shuffle)
   if shuffle:
     dataset = dataset.shuffle(filenames_shuffle_buffer_size)
   elif num_readers > 1:
     logging.warning('`shuffle` is false, but the input data stream is '
-                    'still slightly shuffled since `num_readers` > 1.')
+                      'still slightly shuffled since `num_readers` > 1.')
   dataset = dataset.repeat(num_epochs or None)
 
   records_dataset = dataset.interleave(
-      map_func=file_read_func,
-      cycle_length=num_readers,
-      block_length=read_block_length,
-      num_parallel_calls=tf.data.experimental.AUTOTUNE,
-      deterministic=shuffle)
+        map_func=file_read_func,
+        cycle_length=num_readers,
+        block_length=read_block_length,
+        num_parallel_calls=tf.data.experimental.AUTOTUNE,
+        deterministic=shuffle)
 
   if shuffle:
     records_dataset = records_dataset.shuffle(shuffle_buffer_size)
   return records_dataset
 
+  # def convert_tensor_to_string(file_path):
+  #   # you should decode bytes type to string type
+  #   # print("file_path: ",bytes.decode(file_path.numpy()),type(bytes.decode(file_path.numpy())))
+  #   # return file_path.numpy()
+  #   return bytes.decode(file_path.numpy())
+  #
+  # print('************************ in data_provider.py _read_data')
+  #
+  #   # Shard, shuffle, and read files.
+  # dataset = tf.data.Dataset.list_files(file_pattern=file_pattern, shuffle=shuffle)
+  # dataset = dataset.map(lambda x: tf.py_function(convert_tensor_to_string, [x], [tf.string]))
+  # for one_element in dataset.take(10):
+  #   print(one_element)
+  #
+  # if shuffle:
+  #   dataset = dataset.shuffle(filenames_shuffle_buffer_size)
+  # elif num_readers > 1:
+  #   logging.warning('`shuffle` is false, but the input data stream is '
+  #                   'still slightly shuffled since `num_readers` > 1.')
+  # dataset = dataset.repeat(num_epochs or None)
+  #
+  # print('*************before interleave')
+  # for one_element in dataset.take(10):
+  #   print(one_element)
+  # # return dataset
+  # records_dataset = dataset.interleave(
+  #     map_func=file_read_func,
+  #     cycle_length=num_readers,
+  #     block_length=read_block_length,
+  #     num_parallel_calls=tf.data.experimental.AUTOTUNE,
+  #     deterministic=shuffle)
+  #
+  # print('*************after interleave')
+  # for one_element in records_dataset.take(10):
+  #    print(one_element)
+  #
+  # if shuffle:
+  #   records_dataset = records_dataset.shuffle(shuffle_buffer_size)
+  # return records_dataset
 
 
 
 def tfrecord_read_fn(filename):
   return tf.data.TFRecordDataset(filename).prefetch(1)
+
+def pts_read_fn(value):
+
+
+  # # return tf.data.Dataset.from_tensor_slices(filename).prefetch(1)
+  return tf.data.Dataset.from_tensors(value).prefetch(1)
+  # print('pts_read_fn: ' + tf.data.Dataset.from_tensors(filename).prefetch(1))
+  # # return tf.data.Dataset(filename)
+
+  ############################################################
+  # print('***************decode_fn')
+  # print(value)
+  #
+  # import io
+  #
+  # f = io.StringIO()
+  # print(value, file=f)
+  #
+  # # to get the value back
+  # print_value = f.getvalue()
+  # f.close()
+  #
+  # print_value = print_value[print_value.index("'") +1::]
+  # path = print_value[:print_value.index("'"):]
+  #
+  # return tf.data.Dataset.from_tensors(path).prefetch(1)
+  ############################################################
+
+
 
 
 @gin.configurable(
@@ -142,6 +214,7 @@ def get_tf_data_decoder(dataset_format,
                         file_pattern,
                         batch_size,
                         is_training,
+                        is_predicting,
                         preprocess_fn=None,
                         feature_keys=None,
                         label_keys=None,
@@ -188,8 +261,12 @@ def get_tf_data_decoder(dataset_format,
     dictionary with features and labels instead.
   """
 
+  # def _process_fn(key, value):
   def _process_fn(key, value):
     """Sets up tf graph that decodes and preprocesses input."""
+    # tf.compat.v1.enable_eager_execution()
+    tf.config.run_functions_eagerly(True)
+
     tensors_dict = decode_fn(value)
     if preprocess_fn is None:
       return tensors_dict
@@ -200,8 +277,9 @@ def get_tf_data_decoder(dataset_format,
 
   if dataset_format == 'tfrecord':
     read_fn = tfrecord_read_fn
-  else:
-    raise ValueError('Unknown dataset type')
+  elif dataset_format == 'pts':
+    read_fn = pts_read_fn
+    # raise ValueError('Unknown dataset type')
 
   # Read data
   dataset = _read_data(
@@ -218,12 +296,29 @@ def get_tf_data_decoder(dataset_format,
     # insert dummy key to form (key, value pair)
     dataset = dataset.map(lambda x: (None, x))
 
+
   # Preprocess data
-  dataset_dict = tf.data.Dataset.batch(
-      dataset.map(
-          _process_fn, num_parallel_calls=num_parallel_batches),
-      batch_size=batch_size,
-      drop_remainder=True)
+  dataset = dataset.map(_process_fn, num_parallel_calls=num_parallel_batches)
+
+  ##############################################################################
+  # num_parallel_calls=num_parallel_batches
+  # deterministic = None
+  # DEBUG_MODE = False
+  # # source code from tf.data.Dataset.map()
+  # if num_parallel_calls is None or DEBUG_MODE:
+  #    if deterministic is not None and not DEBUG_MODE:
+  #       warnings.warn("The `deterministic` argument has no effect unless the "
+  #                     "`num_parallel_calls` argument is specified.")
+  #    dataset = MapDataset(self, map_func, preserve_cardinality=True)
+  # else:
+  #    dataset = tf.raw_ops.ParallelMapDataset(
+  #         input_dataset = dataset,
+  #         f = _process_fn,
+  #         num_parallel_calls = num_parallel_calls)
+  #         # deterministic = None,
+  #         # preserve_cardinality=True)
+
+  dataset_dict = tf.data.Dataset.batch(dataset, batch_size=batch_size, drop_remainder=True)
   dataset_dict = dataset_dict.prefetch(num_prefetch_batches)
 
   return dataset_dict
@@ -247,7 +342,8 @@ def get_tf_data_dataset(dataset_name,
                         num_parallel_batches=8,
                         num_prefetch_batches=2,
                         dataset_dir=None,
-                        dataset_format=None):
+                        dataset_format=None,
+                        is_predicting=False):
   """Reads a tf.data.Dataset given a dataset name and split and outputs tensors.
 
   Args:
@@ -311,6 +407,5 @@ def get_tf_data_dataset(dataset_name,
       read_block_length=read_block_length,
       shuffle_buffer_size=shuffle_buffer_size,
       num_parallel_batches=num_parallel_batches,
-      num_prefetch_batches=num_prefetch_batches)
-
-
+      num_prefetch_batches=num_prefetch_batches,
+      is_predicting=is_predicting)

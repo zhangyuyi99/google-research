@@ -14,8 +14,8 @@
 
 #!/bin/bash
 
-VERSION=004
-JOB_NAME="seg_shapenet_${VERSION}"
+VERSION=009
+JOB_NAME="train_with_val_data_seg_shapenet_${VERSION}"
 EVAL_DIR="${JOB_NAME}"
 CKPT_DIR="/u/yvu2cv/google-research/tf3d/shapenet/log/${EVAL_DIR}/model"
 

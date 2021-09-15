@@ -376,6 +376,9 @@ def pad_or_clip(mesh_inputs, view_indices_2d_inputs, pad_or_clip_size):
   if pad_or_clip_size:
     num_valid_points = tf.minimum(num_valid_points, pad_or_clip_size)
     for key in sorted(mesh_inputs.keys()):
+      print(key)
+      print(mesh_inputs[key].get_shape())
+      print(mesh_inputs[key].get_shape().as_list())
       num_channels = mesh_inputs[key].get_shape().as_list()[1]
       mesh_inputs[key] = shape_utils.pad_or_clip_nd(
           tensor=mesh_inputs[key],
@@ -393,7 +396,7 @@ def pad_or_clip(mesh_inputs, view_indices_2d_inputs, pad_or_clip_size):
 
 @gin.configurable(
     'semantic_pointcloud_preprocess',
-    denylist=['inputs', 'output_keys', 'is_training'])
+    denylist=['inputs', 'output_keys'])
 def preprocess(inputs,
                output_keys=None,
                is_training=False,
@@ -523,8 +526,17 @@ def preprocess(inputs,
     ValueError: if `inputs` doesn't contain the points_key.
     ValueError: if `points_in_image_frame` does not have rank 3.
   """
+  
+  print("**************************************************")
+  print("preprocessing......")
+  print("**************************************************")
+  
   inputs = dict(inputs)
-
+  print("input data")
+  print("**************************************************")
+  print(inputs)
+  print("**************************************************")
+  
   if using_sequence_dataset:
     all_frame_inputs = inputs
     scene = all_frame_inputs['scene']
@@ -559,7 +571,7 @@ def preprocess(inputs,
     inputs[standard_fields.InputDataFields.point_normals] = inputs[normals_key]
   if intensities_key is not None and intensities_key in inputs:
     inputs[standard_fields.InputDataFields
-           .point_intensities] = inputs[intensities_key]
+           .point_intensities] = tf.cast(inputs[intensities_key], dtype=tf.int32)
   if elongations_key is not None and elongations_key in inputs:
     inputs[standard_fields.InputDataFields
            .point_elongations] = inputs[elongations_key]
@@ -648,6 +660,7 @@ def preprocess(inputs,
   if standard_fields.InputDataFields.point_positions not in inputs:
     raise ValueError('`inputs` must contain a point_positions')
   if inputs[standard_fields.InputDataFields.point_positions].shape.ndims != 2:
+    print(inputs[standard_fields.InputDataFields.point_positions])
     raise ValueError('points must be of rank 2.')
   if inputs[standard_fields.InputDataFields.point_positions].shape[1] != 3:
     raise ValueError('point should be 3 dimensional.')
@@ -682,15 +695,18 @@ def preprocess(inputs,
   #                      non_tensor_inputs}
   mesh_keys = []
   for key in [
-      standard_fields.InputDataFields.point_positions,
+      standard_fields.InputDataFields.point_positions,        # not empty
       standard_fields.InputDataFields.point_colors,
       standard_fields.InputDataFields.point_normals,
       standard_fields.InputDataFields.point_intensities,
       standard_fields.InputDataFields.point_elongations,
-      standard_fields.InputDataFields.object_class_points,
+      standard_fields.InputDataFields.object_class_points,        # not empty
       standard_fields.InputDataFields.point_spin_coordinates,
       standard_fields.InputDataFields.object_flow_points,
       standard_fields.InputDataFields.point_frame_index,
+      # added by Yuyi 
+      # standard_fields.InputDataFields.object_class_voxels,
+      
   ]:
     if key is not None and key in inputs:
       mesh_keys.append(key)
@@ -782,7 +798,8 @@ def preprocess(inputs,
                                     minval=min_scale_ratio,
                                     maxval=max_scale_ratio,
                                     dtype=tf.float32)
-    mesh_inputs[standard_fields.InputDataFields.point_positions] *= scale_ratio
+    mesh_inputs[standard_fields.InputDataFields.point_positions] = tf.cast(
+        mesh_inputs[standard_fields.InputDataFields.point_positions],dtype=tf.float32) * scale_ratio
     if standard_fields.InputDataFields.object_flow_points in mesh_inputs:
       mesh_inputs[
           standard_fields.InputDataFields.object_flow_points] *= scale_ratio
@@ -885,7 +902,7 @@ def preprocess(inputs,
     mesh_inputs[standard_fields.InputDataFields
                 .point_normals_original] = original_normals
 
-  # Pad or clip the point tensors.
+  # TODO: Pad or clip the point tensors.
   pad_or_clip(
       mesh_inputs=mesh_inputs,
       view_indices_2d_inputs=view_indices_2d_inputs,
@@ -1005,4 +1022,10 @@ def preprocess(inputs,
     processed_inputs = {
         k: v for k, v in six.iteritems(processed_inputs) if k in output_keys
     }
+
+  print("**************************************************")    
+  print("preprocessing completed......")
+  print("**************************************************")
+
+  print(processed_inputs)
   return processed_inputs
