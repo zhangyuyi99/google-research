@@ -63,9 +63,22 @@ class SemanticSegmentationModel(base_model.BaseModel):
             num_classes
     }
 
+    task_names_to_use_relu_last_conv = {
+        standard_fields.DetectionResultFields.object_semantic_voxels:
+            True
+    }
+
+    task_names_to_use_batch_norm_in_last_layer = {
+        standard_fields.DetectionResultFields.object_semantic_voxels:
+            True
+    }
+
     self.num_classes = num_classes
     self.sparse_conv_unet = sparse_voxel_unet.SparseConvUNet(
-        task_names_to_num_output_channels=task_names_to_num_output_channels)
+        task_names_to_num_output_channels=task_names_to_num_output_channels,
+        task_names_to_use_relu_last_conv=task_names_to_use_relu_last_conv,
+        task_names_to_use_batch_norm_in_last_layer=task_names_to_use_batch_norm_in_last_layer)
+
 
   def call(self, inputs, training=True):
     """Runs the model and returns the semantic logits prediction.

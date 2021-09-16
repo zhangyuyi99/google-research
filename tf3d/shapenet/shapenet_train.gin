@@ -40,9 +40,11 @@ get_tf_data_dataset.num_readers = 16
 
 # 3D Network
 SparseConvUNet.conv_filter_size = 3
-SparseConvUNet.encoder_dimensions = ((24, 24), (24, 32), (32, 48), (48, 64), (64, 80), (80, 96), (96, 112))
-SparseConvUNet.bottleneck_dimensions = (112, 112)
-SparseConvUNet.decoder_dimensions = ((112, 112), (96, 96), (80, 80), (64, 64), (48, 48), (32, 32), (16, 16))
+# SparseConvUNet.encoder_dimensions = ((24, 24), (24, 32), (32, 48), (48, 64), (64, 80), (80, 96), (96, 112))
+SparseConvUNet.encoder_dimensions = ((6, 6), (6, 8), (8, 12), (12, 16), (16, 20), (20, 24), (24, 28))
+SparseConvUNet.bottleneck_dimensions = (28, 28)
+# SparseConvUNet.decoder_dimensions = ((112, 112), (96, 96), (80, 80), (64, 64), (48, 48), (32, 32), (16, 16))
+SparseConvUNet.decoder_dimensions = ((28, 28), (24, 24), (20, 20), (16, 16), (12, 12), (8, 8), (4, 4))
 SparseConvUNet.use_batch_norm = True
 SemanticSegmentationModel.num_classes = %num_classes
 

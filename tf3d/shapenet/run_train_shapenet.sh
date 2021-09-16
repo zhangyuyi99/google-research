@@ -14,9 +14,9 @@
 
 #!/bin/bash
 
-VERSION=010
-JOB_NAME="seg_shapenet_${VERSION}"
-TRAIN_DIR="/u/yvu2cv/google-research/tf3d/shapenet/log/train_with_val_data_${JOB_NAME}"
+VERSION=0010
+JOB_NAME="aws_seg_shapenet_${VERSION}"
+TRAIN_DIR="/home/ec2-user/google-research/tf3d/shapenet/log/train_with_train_data_${JOB_NAME}"
 
 
 
@@ -33,11 +33,11 @@ LOG_FREQ=100
 # Data
 DATASET_NAME="shapenet"
 TRAIN_SPLIT="0"
-DATASET_PATH="/u/yvu2cv/google-research/tf3d/data/shapenet_data_tfrecords/val_data_with_labels/02691156" # REPLACE
+DATASET_PATH="/home/ec2-user/shapenet_data_tfrecords/val_data_with_labels/02691156" # REPLACE
 
 # Gin config
 IMPORT_MODULE="tf3d.gin_imports"
-TRAIN_GIN_CONFIG="/u/yvu2cv/google-research/tf3d/shapenet/shapenet_train.gin"
+TRAIN_GIN_CONFIG="/home/ec2-user/google-research/tf3d/shapenet/shapenet_train.gin"
 
 PARAMS="get_tf_data_dataset.dataset_name = '${DATASET_NAME}'
 get_tf_data_dataset.split_name = '${TRAIN_SPLIT}'

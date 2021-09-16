@@ -93,22 +93,22 @@ class SparseConvUNet(tf.keras.layers.Layer):
     print(task_names_to_use_relu_last_conv)
     print('*****************task_names_to_use_batch_norm_in_last_layer')
     print(task_names_to_use_batch_norm_in_last_layer)
-    # if task_names_to_num_output_channels is None:
-    #   raise ValueError('task_names_to_num_output_channels cannot be None')
-    #
-    # if len(encoder_dimensions) != len(decoder_dimensions):
-    #   raise ValueError(
-    #       'The number of encoder and decoder blocks should be equal')
-    #
-    # if task_names_to_use_relu_last_conv is None:
-    #   task_names_to_use_relu_last_conv = {}
-    #   for key in sorted(task_names_to_num_output_channels):
-    #     task_names_to_use_relu_last_conv[key] = False
-    #
-    # if task_names_to_use_batch_norm_in_last_layer is None:
-    #   task_names_to_use_batch_norm_in_last_layer = {}
-    #   for key in sorted(task_names_to_num_output_channels):
-    #     task_names_to_use_batch_norm_in_last_layer[key] = False
+    if task_names_to_num_output_channels is None:
+      raise ValueError('task_names_to_num_output_channels cannot be None')
+
+    if len(encoder_dimensions) != len(decoder_dimensions):
+      raise ValueError(
+          'The number of encoder and decoder blocks should be equal')
+
+    if task_names_to_use_relu_last_conv is None:
+      task_names_to_use_relu_last_conv = {}
+      for key in sorted(task_names_to_num_output_channels):
+        task_names_to_use_relu_last_conv[key] = False
+
+    if task_names_to_use_batch_norm_in_last_layer is None:
+      task_names_to_use_batch_norm_in_last_layer = {}
+      for key in sorted(task_names_to_num_output_channels):
+        task_names_to_use_batch_norm_in_last_layer[key] = False
 
     self.num_levels = len(encoder_dimensions)
     self.network_pooling_segment_func = network_pooling_segment_func
@@ -163,10 +163,10 @@ class SparseConvUNet(tf.keras.layers.Layer):
       conv_block_task_2 = sparse_voxel_net_utils.SparseConvBlock3D(
           num_convolution_channels_list=[num_task_channels],
           conv_filter_size=conv_filter_size,
-          # use_batch_norm=task_names_to_use_batch_norm_in_last_layer[task_name],
+          use_batch_norm=task_names_to_use_batch_norm_in_last_layer[task_name],
           use_batch_norm=True,
           dropout_prob=0.0,
-          # apply_relu_to_last_conv=task_names_to_use_relu_last_conv[task_name],
+          apply_relu_to_last_conv=task_names_to_use_relu_last_conv[task_name],
           apply_relu_to_last_conv=True,
           normalize_sparse_conv=normalize_sparse_conv)
       setattr(self, f'{task_name}/final_conv2_block', conv_block_task_2)
