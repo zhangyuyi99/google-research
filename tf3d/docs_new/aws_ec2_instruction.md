@@ -57,5 +57,8 @@ For other ways to connect see https://docs.aws.amazon.com/AWSEC2/latest/UserGuid
 Download FileZilla to transfer data referring to https://angus.readthedocs.io/en/2014/amazon/transfer-files-between-instance.html
 
 
+Now you are good to go [setting tf3d](https://github.com/zhangyuyi99/google-research/blob/8960137f970ba8676062ec30bc32b38126d3df85/tf3d/docs_new/installation.md) and start your first experiment! 
+
+
 
 
