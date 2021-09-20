@@ -56,6 +56,17 @@ For other ways to connect see https://docs.aws.amazon.com/AWSEC2/latest/UserGuid
 
 Download FileZilla to transfer data referring to https://angus.readthedocs.io/en/2014/amazon/transfer-files-between-instance.html
 
+## 5. Install Docker on your instance 
+
+Refer to [Docker basics for Amazon ECS](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/docker-basics.html).
+
+## IMPORTANT: SHUT DOWN THE INSTANCE AFTER USING!
+
+...don't be bothered if you are super rich though :)
+
+You might find the [AWS Instance Scheduler](https://aws.amazon.com/solutions/implementations/instance-scheduler/) useful. 
+
+
 
 Now you are good to go [setting tf3d](https://github.com/zhangyuyi99/google-research/blob/8960137f970ba8676062ec30bc32b38126d3df85/tf3d/docs_new/installation.md) and start your first experiment! 
 
