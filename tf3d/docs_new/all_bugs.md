@@ -1,7 +1,9 @@
-# tf3d Error Summary 
-exploration on tensorflow 3d 
+# tf3d Toubleshooting
+exploration on tensorflow 3d.
 
-- tensorflow.python.framework.errors_impl.InvalidArgumentError: Need minval < maxval, got 0 >= 0
+Listed are errors in installation and running codes. 
+
+## tensorflow.python.framework.errors_impl.InvalidArgumentError: Need minval < maxval, got 0 >= 0
 
 <details>
 <summary>error message</summary>
@@ -66,13 +68,13 @@ tensorflow.python.framework.errors_impl.InvalidArgumentError: Need minval < maxv
   
 </details>
   
-- `TypeError: Input 'y' of 'Mul' Op has type float32 that does not match type int32 of argument 'x'.`
+## TypeError: Input 'y' of 'Mul' Op has type float32 that does not match type int32 of argument 'x'.
 
 **Solution** 
   
 `tf.cast(y, tf.float32)`
   
- - ImportError: cannot import name 'string_int_label_map_pb2'
+## ImportError: cannot import name 'string_int_label_map_pb2'
   
 **Solution** 
   
@@ -80,14 +82,56 @@ tensorflow.python.framework.errors_impl.InvalidArgumentError: Need minval < maxv
  
  from: https://github.com/tensorflow/models/issues/1595
   
- - Convert windows text file to linux
+## Convert windows text file to linux
   
 **Solution** 
   
  `dos2unix filename`
 
- - ModuleNotFoundError: No module named 'tensorflow_sparse_conv_ops'
+## ModuleNotFoundError: No module named 'tensorflow_sparse_conv_ops'
 
 **Solution**
   
 Change `from tensorflow_sparse_conv_ops import sparse_conv_ops` into `from tf3d.ops.tensorflow_sparse_conv_ops import sparse_conv_ops`
+  
+## NVIDIA NVML Driver/library version mismatch 
+## failed call to cuInit: CUDA_ERROR_NO_DEVICE: no CUDA-capable device is detected
+  
+When type `nvidia-smi`. Try uninstalling the nvidia GPU driver by running `/usr/bin/nvidia-uninstall`.
+  
+from: https://stackoverflow.com/questions/43022843/nvidia-nvml-driver-library-version-mismatch and https://partners-intl.aliyun.com/help/doc-detail/109111.htm
+  
+## [AWS] WARNING: UNPROTECTED PRIVATE KEY FILE! at log in 
+  
+**Solution** 
+
+`chmod  400 ~/.ssh/id_rsa`
+  
+## ImportError: libcudnn.so.7: cannot open shared object file: No such file or directory
+  
+**Solution** 
+
+```bash
+export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
+```
+  
+## Could not load dynamic library 'libcudart.so.10.1'; dlerror: libcudart.so.10.1: cannot open shared object file: No such file or directory
+  
+**Solution** 
+  
+Double check that you have CUDA10.1 installed. 
+  
+## Python 3.6 not compatible with Tensorflow 2.3.0, need higher python version 
+  
+**Solution** 
+  
+`pip install tensorflow-gpu==2.3.0`
+  
+ 
+
+
+
+  
+
+
