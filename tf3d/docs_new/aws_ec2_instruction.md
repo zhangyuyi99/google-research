@@ -6,28 +6,39 @@ Refer to https://aws.amazon.com/ec2/getting-started/
 
 Open https://console.aws.amazon.com/ec2/v2/home?region=us-east-1
 
-<p align="center"><img src="img/launch.png" width=743 height=394></p>
+<p align="center"><img src="img/launch.png"></p>
 
 ### 2.1. Choose AMI
 
 Select the Amazon Linux 2 AMI. 
 
+<p align="center"><img src="img/ami.png"></p>
 
 ### 2.2. Choose instance type
 
 The EC2 instance types are listed in https://aws.amazon.com/ec2/instance-types/. Fot machine learning I chose the p3.2xlarge in Accelerated Computing. 
 
+<p align="center"><img src="img/p3.png"></p>
+
 ### 2.3. Configure Instance Details 
 
 Create a new VPC and add a new subnet. Leave the IAM role blank and all other settings default. 
+
+<p align="center"><img src="img/network.png"></p>
+
+<p align="center"><img src="img/subnet.png"></p>
 
 ### 2.4. Add storage 
 
 Attach storage to your instance. I made the root 100GB to store the data file and the cuda setting files. 
 
+<p align="center"><img src="img/storage.png"></p>
+
 ### 2.5. Configure security group
 
 Create a new security group. Select the sourse to be My IP and keep other settings default. 
+
+<p align="center"><img src="img/source.png"></p>
 
 ### 2.6. Review and launch the instance
 
