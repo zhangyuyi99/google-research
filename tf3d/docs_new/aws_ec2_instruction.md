@@ -1,6 +1,6 @@
 # Using AWS EC2 to speed up training 
 Refer to https://aws.amazon.com/ec2/getting-started/ 
-## 1. Get yourself an AWS account by contacting Scott and Debarshi 
+## 1. Get yourself an AWS account by registering one or contacting your manager 
 
 ## 2. Launch your instance 
 
