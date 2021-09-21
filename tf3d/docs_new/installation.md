@@ -1,14 +1,14 @@
-# Install Tensorflow3D on CentOS 7
+# Install Tensorflow3D on CentOS 7 or Amazon Linux 2
 Refer to https://github.com/google-research/google-research/blob/519ccab2b20768783034739611fed68cdee63570/tf3d/doc/setup.md 
-1. Install packages:
+## 1. Install packages:
 ```bash
 sudo yum update
 sudo yum install subversion git
 ```
 
-2. Install CUDA 10.1, nvidia driver and cuDNN 7.6.5:
+## 2. Install CUDA 10.1, nvidia driver and cuDNN 7.6.5:
 	
-2.1. For CUDA 10.1, follow https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html.
+### 2.1. For CUDA 10.1, follow https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html.
   
 Note:  
 i. 
@@ -25,7 +25,7 @@ iii. Skip the 9.1.2. POWER9 Setup in post-installation actions. According to goo
 	
 iv. I skipped all the recommended actions
 	
-2.2. For nvidia driver, follow https://docs.nvidia.com/datacenter/tesla/tesla-installation-notes/index.html
+### 2.2. For nvidia driver, follow https://docs.nvidia.com/datacenter/tesla/tesla-installation-notes/index.html
   
 Note:  
 i. do not use .run file to install driver. Package manager method worked for me.
@@ -36,14 +36,14 @@ sudo dnf install -y tar bzip2 make automake gcc gcc-c++ pciutils elfutils-libelf
 ```
 I used yum instead of dnf. 
 
-2.3. For cuDNN 7.6.5, follow https://docs.nvidia.com/deeplearning/cudnn/install-guide/index.html 
+### 2.3. For cuDNN 7.6.5, follow https://docs.nvidia.com/deeplearning/cudnn/install-guide/index.html 
 	
 	
-3. Install miniconda according to:
+## 3. Install miniconda according to:
 	https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html
 	
   
-4. Create conda environment:
+## 4. Create conda environment:
 ```bash
 source {$PATH TO YOUR MINICONDA}/etc/profile.d/conda.sh
 conda create --name tf3d
@@ -51,7 +51,7 @@ conda activate tf3d
 ```
 	
   
-5. Within the environment tf3d, install the dependencies:
+## 5. Within the environment tf3d, install the dependencies:
 ```bash
 pip install -r tf3d/requirements.txt
 sudo yum update
@@ -59,9 +59,9 @@ sudo yum install protobuf-compiler python3-dev
 ```
 
 
-6. Now we prepare the sparse conv ops as well as set up the nvidia-docker:
+## 6. Now we prepare the sparse conv ops as well as set up the nvidia-docker:
 	
-6.1.  change ${TF_FOLDER} and ${CUSTOM_OP_FOLDER} into your local address of cloned tensorflow and custom-op projects
+### 6.1.  change ${TF_FOLDER} and ${CUSTOM_OP_FOLDER} into your local address of cloned tensorflow and custom-op projects
 ```bash
 git clone https://github.com/tensorflow/tensorflow
 # Or download https://github.com/tensorflow/tensorflow/archive/v2.3.0.zip and unzip.
@@ -82,10 +82,10 @@ cp -a ${CUSTOM_OP_FOLDER}/gpu ${CUSTOM_OP_FOLDER}/tf \
 ${CUSTOM_OP_FOLDER}/configure.sh tf3d/ops/
 ```
 	
-6.2.  set up the nvidia-docker following:
+### 6.2.  set up the nvidia-docker following:
 	      https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html
 	         
-6.3.  Enter the docker image with mapped tf3d folder, change ${PATH_TO_FOLDER_WITH_TF3D} according to your local folders
+### 6.3.  Enter the docker image with mapped tf3d folder, change ${PATH_TO_FOLDER_WITH_TF3D} according to your local folders
 ```bash
 docker pull tensorflow/tensorflow:2.3.0-custom-op-gpu-ubuntu16
 sudo docker run --runtime=nvidia --privileged -it -v ${PATH_TO_FOLDER_WITH_TF3D}:Z -w /working_dir  tensorflow/tensorflow:2.3.0-custom-op-gpu-ubuntu16
@@ -108,7 +108,7 @@ source .bashrc
 ```
 Refer to: https://www.programmersought.com/article/2584623911/      
 	
-6.4. Within the docker image, enter tf3d/ops folder and run the following to test the building:
+### 6.4. Within the docker image, enter tf3d/ops folder and run the following to test the building:
 ```bash	
 # Make sure you are using tensorflow version to 2.3.0
 pip3 uninstall tensorflow
@@ -129,7 +129,7 @@ ii. If you run into "undefined symbol: _ZN10tensorflow8OpKernel11TraceStringEPNS
 ```bash
 pip show tensorflow
 ```			
-		My tensorflow is installed in /usr/local/lib/python3.6/dist-packages/tensorflow. Change ${PATH_TO_TF_LIB} to your tensorflow location and try:
+My tensorflow is installed in /usr/local/lib/python3.6/dist-packages/tensorflow. Change ${PATH_TO_TF_LIB} to your tensorflow location and try:
 ```bash			
 bazel run sparse_conv_ops_py_test  --experimental_repo_remote_exec --verbose_failures --cxxopt=-std=c++11 --cxxopt="-L ${PATH_TO_TF_LIB}" --cxxopt="-ltensorflow_framework" --cxxopt="-O2" --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0"
 ```
@@ -139,14 +139,14 @@ iii. If you are using GPU with computation capability <3.5, add the following li
 --copt=-DTF_EXTRA_CUDA_CAPABILITIES=3.0
 ```
 	  
-6.5. After the test succeeds, copy the shared library to tf3d/ops/tensorflow_sparse_conv_ops folder:
+### 6.5. After the test succeeds, copy the shared library to tf3d/ops/tensorflow_sparse_conv_ops folder:
 ```bash
 cp -a bazel-bin/tensorflow_sparse_conv_ops/_sparse_conv_ops.so tensorflow_sparse_conv_ops/
 ```
 If you see permission denied or operation not permitted error, exit the docker image and do chmod files locally, as the docker inherits the local permission. 
 	
-6.6. Exit the docker image.
-	  Enter the parent folder containing the tf3d folder, the sparse conv ops can be imported as follows:
+### 6.6. Exit the docker image.
+Enter the parent folder containing the tf3d folder, the sparse conv ops can be imported as follows:
 ```python
 import tf3d.ops.tensorflow_sparse_conv_ops as sparse_conv_ops
 ```
