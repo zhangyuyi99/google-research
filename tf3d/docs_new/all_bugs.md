@@ -1,4 +1,4 @@
-# tf3d Toubleshooting
+# Troubleshooting
 exploration on tensorflow 3d.
 
 Listed are errors in installation and running codes. 
